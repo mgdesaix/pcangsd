@@ -265,3 +265,48 @@ cpdef writeBeagle(float[:,::1] Po, str beagle):
                 fprintf(outf, "\n")
     fclose(outf)
 
+
+##############################################
+# Matt's population allele frequency reader
+# Read populations' allele frequencies text format
+cpdef np.ndarray[DTYPE_t, ndim=2] readPopAF(str pop_af):
+    cdef int c = 0
+    cdef int i, m, k, s
+    cdef bytes line_bytes
+    cdef str line_str
+    cdef char* line
+    cdef char* token
+    cdef char* delims = "\t \n"
+    cdef vector[vector[float]] L
+    cdef vector[float] L_ind
+    with os.popen("zcat " + pop_af) as f:
+        # Count number of POPULATIONS from first line
+        line_bytes = str.encode(f.readline())
+        line = line_bytes
+        token = strtok(line, delims)
+        while token != NULL:
+            token = strtok(NULL, delims)
+            c += 1
+        k = c
+
+        # Add lines to vector
+        for line_str in f:
+            line_bytes = str.encode(line_str)
+            line = line_bytes
+            token = strtok(line, delims)
+            token = strtok(NULL, delims)
+            token = strtok(NULL, delims)
+            for i in range(k):
+                if (i + 1) % 1 == 0:
+                    token = strtok(NULL, delims)
+                else:
+                    L_ind.push_back(atof(strtok(NULL, delims)))
+            L.push_back(L_ind)
+            L_ind.clear()
+    m = L.size() # Number of sites
+    cdef np.ndarray[DTYPE_t, ndim=2] L_np = np.empty((m, k), dtype=DTYPE)
+    cdef float *L_ptr
+    for s in range(m):
+        L_ptr = &L[s][0]
+        L_np[s] = np.asarray(<float[:(k)]> L_ptr)
+    return L_np
