@@ -1,0 +1,133 @@
+---
+title: "GL assignment: EM versus MCMC"
+author: "Matt G. DeSaix"
+date: "8/25/2022"
+output: html_document
+---
+
+```{r}
+# for dirichlet
+library(gtools)
+```
+
+Testing out the EM algorithm and likelihood things
+
+*L.mat* is an *N x K* matrix of the likelihoods for *N* individuals to *K* populations. I think this is the same as the *Q matrix* in the conditional GSI model of Eric's. This is computed once, then used to determine the mixing proportions. Since these will be really small in real life, I'll go ahead and use the log likelihood since that is how it'll be done in the actual implementation. Example below has $n=4$ individuals with higher likelihood to pop1 than pop2, $n=2$ ind for higher likelihood to pop2 than pop1 and $n=1$ ind that is equal likelihood to 2 pops. 
+
+```{r}
+## Constants
+
+## Likelihood matrix
+l.mat <- t(matrix(c(0.01,0.08,
+                  0.02,0.06,
+                  0.05,0.05,
+                  0.09,0.01,
+                  0.07,0.05,
+                  0.00009, 0.000001,
+                  0.9, 0.2),
+                nrow = 2))
+## individuals and populations
+nind <- nrow(l.mat)
+npops <- ncol(l.mat)
+
+# log likelihood
+L.mat <- log(l.mat)
+L.mat
+```
+
+
+admixture matrix
+
+```{r}
+pi0.vec <- c(0.5, 0.5)
+pi.mat <- diag(pi0.vec)
+pi.mat
+```
+
+## EM example
+
+We'll use the EM algorithm to update the mixing proportions for $t$ iterations...
+
+```{r}
+t <- 10
+
+# set the initial values
+pi0.vec <- c(0.5, 0.5)
+pi.mat <- diag(pi0.vec)
+
+
+pi.em.iter <- matrix(nrow = t,
+                     ncol = npops)
+
+for(j in 1:t){
+  
+  # get numerators of likelihood of ind i to k
+  L.pi.mat <- exp(L.mat) %*% pi.mat
+  # get denominator: sum of k likelihoods for each i
+  # divide numerator by denominator in for loop, now each row sums to 1
+  L.pi.mat.sum <- matrix(nrow = nind,
+                          ncol = npops)
+  for(i in 1:nind){
+    L.pi.mat.sum[i,] <- L.pi.mat[i,] / sum(L.pi.mat[i,])
+  }
+  # sum of the columns divided by the number of individuals gives the EM of the mixing proportion
+  pi.vec <- apply(L.pi.mat.sum, 2, sum) / nind
+  pi.em.iter[j,] <- pi.vec
+  # redefine mixing proportion to start over a new iteration
+  pi.mat <- diag(pi.vec)
+}
+
+pi.em.iter
+```
+
+Seems to make sense, now let's try some gibbs
+
+
+## MCMC example
+
+If I followed this correct, now we are just going to add another latent variable, $Z_i$ to denote the unknown population of origin that determines the mixing proportions.
+
+I'm not sure if I'm messing something up here but the values seem to go all over the place - but seems like maybe that's the point with small sample sizes with MCMC? Since the EM is deterministic it doesn't show the same variation the way MCMC includes the prior which could make the mixing proportions highly stochastic if not many individuals are sampled...I still think something is wrong with this implementation.
+
+```{r}
+# re-set initial prior
+pi0.vec <- c(0.5, 0.5)
+pi.mat <- diag(pi0.vec)
+
+t <- 30
+
+pi.mcmc.iter <- matrix(nrow = t,
+                     ncol = npops)
+
+for(j in 1:t){
+  
+  L.pi.mat <- exp(L.mat) %*% pi.mat
+  
+  L.pi.mat.sum <- matrix(nrow = nrow(L.pi.mat),
+                          ncol = ncol(L.pi.mat))
+  for(i in 1:nrow(L.pi.mat)){
+    L.pi.mat.sum[i,] <- L.pi.mat[i,] / sum(L.pi.mat[i,])
+  }
+  pi.vec <- apply(L.pi.mat.sum, 2, sum) / nrow(L.pi.mat.sum)
+  # Gibbs now differs from EM here, seems like it just adds the steps?
+  
+  # Here: assign each individual to a population based on mixing proportions weighted by likelihood
+  zi <- t(rmultinom(nind, 1, pi.vec))
+  # count individuals assigned
+  ind.count <- apply(zi,2,sum)
+  # add assigned individuals with prior
+  dirichlet.input <- pi0.vec + ind.count
+  # re-calculate mixing proportions with dirichlet
+  pi.vec.dirichlet <- rdirichlet(1, dirichlet.input)
+  
+  pi.mcmc.iter[j,] <- pi.vec.dirichlet
+  # save off mixing proportion for next iteration
+  pi.mat <- diag(c(pi.vec.dirichlet))
+}
+
+pi.mcmc.iter
+```
+
+
+
+
