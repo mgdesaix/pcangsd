@@ -106,12 +106,13 @@ parser.add_argument("--dosage_save", action="store_true",
 parser.add_argument("--sites_save", action="store_true",
 	help="Save boolean vector of used sites")
 
+#############################################################3
 ## New stuff for GLassyPop
 parser.add_argument("--pop_af_file", metavar="FILE",
 	help="Filepath to reference population allele frequencies")
 parser.add_argument("--pop_like", action="store_true", 
   help="Estimate log likelihood of individual assignment to each reference population")
-
+###################################################################
 
 ##### PCAngsd #####
 def main():
@@ -466,13 +467,20 @@ def main():
 		np.savetxt(args.out + ".sites", siteVec, fmt="%i")
 		print("Saved boolean vector of sites kept after filtering as " + \
 				str(args.out) + ".sites (Text)")
-	
+
+##############################################################	
 	# Population assignment likelihood
 	if args.pop_like:
+	  print("Parsing population allele frequency file.")
+	  assert os.path.isfile(args.pop_af_file), "Population allele frequency file doesn't exist!!"
+	  A = reader_cy.readPopAF(args.pop_af_file)
+	  
 	  print("Calculating likelihood of population assignment")
 	  logl_mat = glassy.assignLL(L, A, t)
-
-
+	  np.savetxt(args.out + ".pop_like", logl_mat, fmt="%.7f")
+	  print("Saved population assignment log likelihoods as " + str(args.out) + \
+	       ".pop_like (text)")
+############################################################
 ##### Define main #####
 if __name__ == "__main__":
 	main()
