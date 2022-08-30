@@ -477,7 +477,7 @@ def main():
 	  # A = reader_cy.readPopAF(args.pop_af_file)
 	  A = np.loadtxt(args.pop_af_file, delimiter="\t")
 	  print("Calculating likelihood of population assignment")
-	  logl_mat = glassy.assignLL(L, A, t)
+	  logl_mat = glassy.assignLL(L, A, args.threads)
 	  np.savetxt(args.out + ".pop_like", logl_mat, fmt="%.7f")
 	  print("Saved population assignment log likelihoods as " + str(args.out) + \
 	       ".pop_like (text)")
