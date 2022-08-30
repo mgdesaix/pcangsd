@@ -44,6 +44,13 @@ extensions = [Extension(
 				extra_compile_args=['-fopenmp', '-g0'],
 				extra_link_args=['-fopenmp'],
 				include_dirs=[numpy.get_include()]
+			),
+			Extension(
+				"pcangsd.glassy_cy",
+				["pcangsd/glassy_cy.pyx"],
+				extra_compile_args=['-fopenmp', '-g0'],
+				extra_link_args=['-fopenmp'],
+				include_dirs=[numpy.get_include()]
 			)]
 
 setup(
