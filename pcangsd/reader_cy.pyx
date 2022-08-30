@@ -294,9 +294,9 @@ cpdef np.ndarray[DTYPE_t, ndim=2] readPopAF(str pop_af):
             line_bytes = str.encode(line_str)
             line = line_bytes
             token = strtok(line, delims)
-            token = strtok(NULL, delims)
-            token = strtok(NULL, delims)
-            for i in range(k):
+            # token = strtok(NULL, delims)
+            # token = strtok(NULL, delims)
+            for i in range(1, k):
                 if (i + 1) % 1 == 0:
                     token = strtok(NULL, delims)
                 else:
