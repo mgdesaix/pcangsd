@@ -473,8 +473,9 @@ def main():
 	if args.pop_like:
 	  print("Parsing population allele frequency file.")
 	  assert os.path.isfile(args.pop_af_file), "Population allele frequency file doesn't exist!!"
-	  A = reader_cy.readPopAF(args.pop_af_file)
-	  
+	  # Need to figure out cython reader for this
+	  # A = reader_cy.readPopAF(args.pop_af_file)
+	  A = np.loadtxt(args.pop_af_file, delimiter="\t")
 	  print("Calculating likelihood of population assignment")
 	  logl_mat = glassy.assignLL(L, A, t)
 	  np.savetxt(args.out + ".pop_like", logl_mat, fmt="%.7f")
