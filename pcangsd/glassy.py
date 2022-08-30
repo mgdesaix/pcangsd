@@ -25,7 +25,7 @@ def assignLL(L, A, t):
     # loglike matrix, of n x k (rows = individuals, columns = reference pops)
     logl_mat = np.zeros((n,k), dtype=np.float32)
     
-    print(int(n) + " individuals to assign to " + int(k) " populations")
+    print(str(n) + " individuals to assign to " + str(k) " populations")
     
     for i in range(n):
         for j in range(k):
@@ -35,7 +35,7 @@ def assignLL(L, A, t):
             glassy_cy.loglike(L, A, logl_vec, t, i, j)
             # loglike sum
             loglike = np.sum(logl_vec, dtype=float)
-            print("Individual " + int(i) + " done for pop " int(j))
+            print("Individual " + str(i) + " done for pop " str(j))
             print("Log-likelihood: " + str(loglike))
             # fill output matrix
             logl_mat[i,j] = loglike
