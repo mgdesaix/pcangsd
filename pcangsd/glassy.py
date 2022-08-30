@@ -25,6 +25,8 @@ def assignLL(L, A, t):
     # loglike matrix, of n x k (rows = individuals, columns = reference pops)
     logl_mat = np.zeros((n,k), dtype=np.float32)
     
+    print(int(n) + " individuals to assign to " + int(k) " populations")
+    
     for i in range(n):
         for j in range(k):
             # set log like vector for individual i to pop j
@@ -41,4 +43,4 @@ def assignLL(L, A, t):
     return logl_mat
 
 # EM algorithm for mixing proportions
-def emProp():
+# def emProp():

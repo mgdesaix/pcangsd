@@ -106,6 +106,12 @@ parser.add_argument("--dosage_save", action="store_true",
 parser.add_argument("--sites_save", action="store_true",
 	help="Save boolean vector of used sites")
 
+## New stuff for GLassyPop
+parser.add_argument("--pop_af_file", metavar="FILE",
+	help="Filepath to reference population allele frequencies")
+parser.add_argument("--pop_like", action="store_true", 
+  help="Estimate log likelihood of individual assignment to each reference population")
+
 
 ##### PCAngsd #####
 def main():
@@ -154,6 +160,7 @@ def main():
 	from pcangsd import inbreed
 	from pcangsd import admixture
 	from pcangsd import tree
+	from pcangsd import glassy
 
 	# Parse data
 	if args.beagle is not None:
@@ -459,7 +466,11 @@ def main():
 		np.savetxt(args.out + ".sites", siteVec, fmt="%i")
 		print("Saved boolean vector of sites kept after filtering as " + \
 				str(args.out) + ".sites (Text)")
-
+	
+	# Population assignment likelihood
+	if args.pop_like:
+	  print("Calculating likelihood of population assignment")
+	  logl_mat = glassy.assignLL(L, A, t)
 
 
 ##### Define main #####
