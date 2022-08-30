@@ -31,6 +31,10 @@ def assignLL(L, A, t):
         for j in range(k):
             # set log like vector for individual i to pop j
             logl_vec = np.zeros(m, dtype=np.float32)
+            # Check what's going on with double vs float
+            print("A is " + str(np.array(list(A)).dtype))
+            print("L is " + str(np.array(list(L)).dtype))
+            print("logl_vec is " + str(np.array(list(logl_vec)).dtype))
             # fill vector
             glassy_cy.loglike(L, A, logl_vec, t, i, j)
             # loglike sum
