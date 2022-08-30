@@ -16,6 +16,6 @@ cpdef loglike(float[:,::1] L, float[:,::1] A, float[::1] loglike_vec, int t, int
     with nogil:
             for s in prange(m, num_threads=t):
                 like0 = L[s,2*i+0]*(1 - A[s,k])*(1 - A[s,k])
-                like1 = L[s,2*i+1]*2*(1 - A[s,])*A[s,k]
+                like1 = L[s,2*i+1]*2*(1 - A[s,k])*A[s,k]
                 like2 = (1 - L[s,2*i] - L[s,2*i+1]) * A[s,k] * A[s,k]
                 loglike_vec[s] = log(like0 + like1 + like2)
