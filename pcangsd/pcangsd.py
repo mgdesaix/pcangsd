@@ -478,11 +478,12 @@ def main():
 ####################################
 # Matt's additions
   # Step 1) Reference population allele frequencies
-	if args.get_pop_like:
-	  print("Parsing population allele frequency file.")
-	  assert os.path.isfile(args.pop_af_file), "Population allele frequency file does not exist!!"
-	  # Need to figure out cython reader for this
-	  # A = reader_cy.readPopAF(args.pop_af_file)
+	if args.get_reference_af:
+	  print("Parsing reference population ID file.")
+	  assert os.path.isfile(args.pop_af_file), "Reference population ID file does not exist!!"
+	  # File is tab-delimited with 2 columns and each row is an individual
+	  # 1st column = Individual sample names corresponding to Beagle file
+	  # 2nd column = Reference pop name
 	  A = np.load(args.pop_af_file)
 	  print("Calculating likelihood of population assignment")
 	  logl_mat = glassy.assignLL(L, A, args.threads)
