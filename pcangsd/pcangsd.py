@@ -501,10 +501,12 @@ def main():
 	    L_cat = np.concatenate((L1, L2))
 	    L_cat_index = np.sort(L_cat, axis = 0)
 	    L_cat_index.shape = (len(L_cat_index))
-	    
-	    f_pop = shared.emMAF(L[:,L_cat_index], args.maf_iter, args.maf_tole, args.threads)
+	    L_pop = np.ascontiguousarray(L[:,L_cat_index])
+	    f_pop = shared.emMAF(L_pop, args.maf_iter, args.maf_tole, args.threads)
 	    f[:,i] = f_pop
+	    del L_pop, f_pop
 	  np.save(args.out + ".popAF", f)
+	  del f
 	  print("Saved reference population allele frequencies as " + str(args.out) + \
 	       ".popAF.npy (Binary - np.float32)\n")
 
