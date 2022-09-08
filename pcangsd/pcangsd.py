@@ -484,12 +484,29 @@ def main():
 	  # File is tab-delimited with 2 columns and each row is an individual
 	  # 1st column = Individual sample names corresponding to Beagle file
 	  # 2nd column = Reference pop name
-	  A = np.load(args.pop_af_file)
-	  print("Calculating likelihood of population assignment")
-	  logl_mat = glassy.assignLL(L, A, args.threads)
-	  np.savetxt(args.out + ".pop_like", logl_mat, fmt="%.7f")
-	  print("Saved population assignment log likelihoods as " + str(args.out) + \
-	       ".pop_like (text)")
+	  IDs = np.loadtxt(args.pop_af_IDs, delimiter = "\t", dtype = "str")
+	  # Unique reference pop names
+	  pops = np.unique(IDs[:,1])
+	  # number of reference pops
+	  npops = len(pops)
+	  m = L.shape[0] # number of sites
+	  f = np.empty((m, npops), dtype=np.float32)
+	  # For each reference population, estimate the allele frequencies from the beagle file
+	  for i in range(npops):
+	    # get indices of which rows in ID file correspond to the given reference pop
+	    pop_index = np.argwhere(IDs[:,1] == pops[i])
+	    # convert indices to relevant column indices of "L" file in pcangsd (Remember Beagle file is converted to 2 cols per individual)
+	    L1 = pop_index*2
+	    L2 = L1 + 1
+	    L_cat = np.concatenate((L1, L2))
+	    L_cat_index = np.sort(L_cat, axis = 0)
+	    L_cat_index.shape = (len(L_cat_index))
+	    
+	    f_pop = shared.emMAF(L[:,L_cat_index], args.maf_iter, args.maf_tole, args.threads)
+	    f[:,i] = f_pop
+	  np.save(args.out + ".popAF", f)
+	  print("Saved reference population allele frequencies as " + str(args.out) + \
+	       ".popAF.npy (Binary - np.float32)\n")
 
 	# Step 2) Population assignment likelihood
 	if args.get_pop_like:
