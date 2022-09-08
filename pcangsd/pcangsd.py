@@ -486,11 +486,8 @@ def main():
     pops = np.unique(IDs[:,1])
     # number of reference pops
     npops = len(pops)
-    
     m = L.shape[0] # Number of sites
     f = np.empty((m, npops), dtype=np.float32)
-    # f.shape = (m, npops)
-    
     # For each reference population, estimate the allele frequencies from the beagle file
     for i in range(npops):
       # get indices of which rows in ID file correspond to the given reference pop
