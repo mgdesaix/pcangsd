@@ -474,9 +474,8 @@ def main():
 		np.savetxt(args.out + ".sites", siteVec, fmt="%i")
 		print("Saved boolean vector of sites kept after filtering as " + \
 				str(args.out) + ".sites (Text)")
-
 ##############################################################
-  # Step 1) Reference population allele frequencies
+# Step 1) Reference population allele frequencies
   if args.get_reference_af:
     assert os.path.isfile(args.pop_af_IDs), "Reference population ID file does not exist!!"
     # File is tab-delimited with 2 columns and each row is an individual
