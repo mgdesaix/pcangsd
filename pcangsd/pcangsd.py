@@ -489,8 +489,8 @@ def main():
     npops = len(pops)
     
     m = L.shape[0] # Number of sites
-    f = np.empty(m * npops, dtype=np.float32)
-    f.shape = (m, npops)
+    f = np.empty((m, npops), dtype=np.float32)
+    # f.shape = (m, npops)
     
     # For each reference population, estimate the allele frequencies from the beagle file
     for i in range(npops):
@@ -517,7 +517,7 @@ def main():
 	  assert os.path.isfile(args.pop_af_file), "Population allele frequency file does not exist!!"
 	  # Need to figure out cython reader for this
 	  # A = reader_cy.readPopAF(args.pop_af_file)
-	  A = np.loadtxt(args.pop_af_file, delimiter="\t")
+	  A = np.load(args.pop_af_file)
 	  print("Calculating likelihood of population assignment")
 	  logl_mat = glassy.assignLL(L, A, args.threads)
 	  np.savetxt(args.out + ".pop_like", logl_mat, fmt="%.7f")
