@@ -504,6 +504,12 @@ def main():
       L_cat_index.shape = (len(L_cat_index))
       
       f_pop = shared.emMAF(L[:,L_cat_index], args.maf_iter, args.maf_tole, args.threads)
+      f[:,i] = f_pop
+    
+    np.save(args.out + ".popAF", f)
+		print("Saved reference population allele frequencies as " + str(args.out) + \
+				".popAF.npy (Binary - np.float32)\n")
+		del f
   
 	# Step 2) Population assignment likelihood
 	if args.get_pop_like:
